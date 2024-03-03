@@ -76,8 +76,12 @@ class ExportTokenTransfersJob(BaseJob):
             filter_params['address'] = self.tokens
 
         try:
-            event_filter = self.web3.eth.filter(filter_params)
-            events = event_filter.get_all_entries()
+            # event_filter = self.web3.eth.filter(filter_params)
+            # events = event_filter.get_all_entries()
+            # changed code here because of issue with erigon node returning empty arrays
+            self._supports_eth_newFilter = False
+            event_filter = self.web3.eth.getLogs(filter_params)
+            events = event_filter
         except ValueError as e:
             if str(e) == "{'code': -32000, 'message': 'the method is currently not implemented: eth_newFilter'}":
                 self._supports_eth_newFilter = False
